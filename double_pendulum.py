@@ -32,7 +32,7 @@ class QueuePosition(list):
     max_length (int): The maximum length of QueuePosition
     """
 
-    def __init__(self, size=4, max_length=10 ** 4):
+    def __init__(self, size=4, max_length=10**4):
         super(QueuePosition, self).__init__()
         self.size = size
         for _ in range(self.size):
@@ -48,10 +48,14 @@ class QueuePosition(list):
         el (list): A list with self.size element
         """
         if len(el) != self.size:
-            raise ValueError("The length of 'el' ({}) should be the same one as self.size ({})")
+            raise ValueError(
+                "The length of 'el' ({}) should be the same one as self.size ({})"
+            )
         if len(self[0]) < self.max_length:
             for i in range(self.size):
-                self[i].append(el[i])  # self[i] is a true List and thus it won't create a loop
+                self[i].append(
+                    el[i]
+                )  # self[i] is a true List and thus it won't create a loop
         else:
             for i in range(self.size):
                 del self[i][0]
@@ -72,16 +76,16 @@ class QueuePosition(list):
 
 class Pendulum:
     """
-    A Class describing the behaviour of a pendulum.
+    A Class describing the behavior of a pendulum.
 
     Attributes:
     -----------
     theta (array): A 2-sized array describing the angle and momentum of the pendulum at the initial time
-    mass (float): The mass of the pendulum that will be used in the moving equation (doesn't change the behaviour of a single pendulum.
+    mass (float): The mass of the pendulum that will be used in the moving equation (doesn't change the behavior of a single pendulum.
     length (float): The length of the rod of the pendulum.
     timelapse (array): Determine the different time for which the position of the pendulum will be computed when 'moving'.
-    list_theta (QueuePosition): Contain the behaviour of the Pendulum through its angles with time.
-    positions (QueuePosition): Contain the behaviour of the Pendulum through its position with time."""
+    list_theta (QueuePosition): Contain the behavior of the Pendulum through its angles with time.
+    positions (QueuePosition): Contain the behavior of the Pendulum through its position with time."""
 
     def __init__(
         self,
@@ -89,7 +93,7 @@ class Pendulum:
         mass=1,
         length=1,
         timelapse=np.linspace(0, 10, 1001),
-        max_length=10 ** 4,
+        max_length=10**4,
     ):
         self.theta = np.array(theta)
         self.mass = mass
@@ -134,7 +138,7 @@ class Pendulum:
         pos = np.array(self.list_theta)
         self.positions = [self.get_position(pos[:, i]) for i in range(len(pos[0]))]
 
-    # Begin with "exact" solution using scipy, and then try EUler and RK4 scheme...
+    # TODO: Begin with "exact" solution using scipy, and then try Euler and RK4 scheme...
     def deriv_for_solver(self):
         """
         Return the derivative of theta, adapted for the solve_ivp function of scipy.
@@ -161,15 +165,13 @@ class DoublePendulum:
     A double pendulum class
     """
 
-    # TODO there is a prblem in the behaviour of the pendulum. Look for Errors in 'derive'
-
     def __init__(
         self,
         theta=[0, 0, 0, 0],
         mass=[1, 1],
         length=[1, 1],
         timelapse=np.linspace(0, 10, 1001),
-        max_length=10 ** 4,
+        max_length=10**4,
     ):
         self.theta = np.array(theta)  # FOrm theta1, theta2, dtheta1, dtheta2
         self.mass = np.array(mass)
@@ -193,7 +195,10 @@ class DoublePendulum:
             * (self.length[0] * theta[2] ** 2 * cost + self.length[1] * theta[3] ** 2)
             - np.sum(self.mass) * G * np.sin(theta[0])
         )
-        denom1 = np.sum(self.mass) * self.length[0] - self.mass[1] * self.length[0] * cost ** 2
+        denom1 = (
+            np.sum(self.mass) * self.length[0]
+            - self.mass[1] * self.length[0] * cost**2
+        )
         num2 = (
             np.sum(self.mass)
             * (
@@ -204,7 +209,10 @@ class DoublePendulum:
             + self.mass[1] * self.length[1] * theta[3] ** 2 * sint * cost
         )
 
-        denom2 = np.sum(self.mass) * self.length[1] - self.mass[1] * self.length[1] * cost ** 2
+        denom2 = (
+            np.sum(self.mass) * self.length[1]
+            - self.mass[1] * self.length[1] * cost**2
+        )
         return np.array([theta[2], theta[3], num1 / denom1, num2 / denom2])
 
     def move(self, epsilon=0.01):
@@ -216,7 +224,9 @@ class DoublePendulum:
         if theta is None:
             theta = self.theta
         x1, y1 = -self.length[0] * np.sin(theta[0]), -self.length[0] * np.cos(theta[0])
-        x2, y2 = x1 - self.length[1] * np.sin(theta[1]), y1 - self.length[1] * np.cos(theta[1])
+        x2, y2 = x1 - self.length[1] * np.sin(theta[1]), y1 - self.length[1] * np.cos(
+            theta[1]
+        )
         return [x1, y1, x2, y2]
 
     def update_positions(self):
@@ -268,10 +278,12 @@ class DisplayPendulum:
     points_pendulums (matplotlib.lines.Line2D): Plot the position of all pendulums
     line_rods (list): A list of Line2D representing the rods of all pendulums.
     line_pendulums (list): A list of Line2D representing the past position of the pendulums
-    animation (matplotlib.animation.FuncAnimation): An animation showing the behaviour of the pendulums.
+    animation (matplotlib.animation.FuncAnimation): An animation showing the behavior of the pendulums.
     """
 
-    def __init__(self, pendulums=None, display_mem=50, timelapse=np.linspace(0, 10, 1001)):
+    def __init__(
+        self, pendulums=None, display_mem=50, timelapse=np.linspace(0, 10, 1001)
+    ):
         self.timelapse = timelapse
         self.display_mem = display_mem
         if pendulums is None:
@@ -301,12 +313,14 @@ class DisplayPendulum:
                 positions[i, frame:frame_end, 0], positions[i, frame:frame_end, 1]
             )
         self.center.set_data([0], [0])
-        self.points_pendulums.set_data(positions[:, frame_end, 0], positions[:, frame_end, 1])
+        self.points_pendulums.set_data(
+            positions[:, frame_end, 0], positions[:, frame_end, 1]
+        )
         return self.center, self.points_pendulums, *self.line_rods, *self.line_pendulums
 
     def create_animation(self):
         """
-        Create an animation showing the behaviour of the pendulums
+        Create an animation showing the behavior of the pendulums
         """
         self.fig, self.ax = plt.subplots()
         ax_lim = 1.2 * self.pendulums[0].length
@@ -315,8 +329,12 @@ class DisplayPendulum:
         self.ax.set_aspect("equal")
         # ls=none means no linestyle
         (self.center,) = self.ax.plot([0], [0], ls="none", marker="o", color="black")
-        (self.points_pendulums,) = self.ax.plot([], [], ls="none", marker="o", color="blue")
-        self.line_rods = [self.ax.plot([], [], color="black")[0] for i in range(self.nb_pend)]
+        (self.points_pendulums,) = self.ax.plot(
+            [], [], ls="none", marker="o", color="blue"
+        )
+        self.line_rods = [
+            self.ax.plot([], [], color="black")[0] for i in range(self.nb_pend)
+        ]
         self.line_pendulums = [
             plt.plot([], [], color="blue", alpha=0.2)[0] for i in range(self.nb_pend)
         ]
@@ -328,6 +346,14 @@ class DisplayPendulum:
             interval=20,
         )
         plt.show()
+
+    def show_pendulums(self):
+        """
+        Show the pendulum in movement.
+        It initiates a move, and create the according animation.
+        """
+        self.move()
+        self.create_animation()
 
 
 class DisplayDoublePendulum:
@@ -346,11 +372,13 @@ class DisplayDoublePendulum:
     points_pendulums (matplotlib.lines.Line2D): Plot the position of all pendulums
     line_rods (list): A list of Line2D representing the rods of all pendulums.
     line_pendulums (list): A list of Line2D representing the past position of the pendulums
-    animation (matplotlib.animation.FuncAnimation): An animation showing the behaviour of the pendulums.
+    animation (matplotlib.animation.FuncAnimation): An animation showing the behavior of the pendulums.
     Display the double pendulum.
     """
 
-    def __init__(self, pendulums=None, display_mem=50, timelapse=np.linspace(0, 10, 1001)):
+    def __init__(
+        self, pendulums=None, display_mem=50, timelapse=np.linspace(0, 10, 1001)
+    ):
         self.timelapse = timelapse
         self.display_mem = display_mem
         if pendulums is None:
@@ -370,6 +398,7 @@ class DisplayDoublePendulum:
         """
         Get the image for the position of the pendulums at time 'frame'
         """
+        # TODO print the trajectory with a quadratic decaying of the transparency.
         positions = np.array([pend.positions for pend in self.pendulums])
         frame_end = frame + self.display_mem
         for i in range(self.nb_pend):
@@ -384,8 +413,12 @@ class DisplayDoublePendulum:
                 positions[i, frame:frame_end, 2], positions[i, frame:frame_end, 3]
             )
         self.center.set_data([0], [0])
-        self.points_pendulums1.set_data(positions[:, frame_end, 0], positions[:, frame_end, 1])
-        self.points_pendulums2.set_data(positions[:, frame_end, 2], positions[:, frame_end, 3])
+        self.points_pendulums1.set_data(
+            positions[:, frame_end, 0], positions[:, frame_end, 1]
+        )
+        self.points_pendulums2.set_data(
+            positions[:, frame_end, 2], positions[:, frame_end, 3]
+        )
         return (
             self.center,
             self.points_pendulums1,
@@ -397,7 +430,7 @@ class DisplayDoublePendulum:
 
     def create_animation(self):
         """
-        Create an animation showing the behavious of the pendulums
+        Create an animation showing the behaviors of the pendulums
         """
         self.fig, self.ax = plt.subplots()
         ax_lim = 1.2 * np.sum(self.pendulums[0].length)
@@ -406,10 +439,18 @@ class DisplayDoublePendulum:
         self.ax.set_aspect("equal")
         # ls=none means no linestyle
         (self.center,) = self.ax.plot([0], [0], ls="none", marker="o", color="black")
-        (self.points_pendulums1,) = self.ax.plot([], [], ls="none", marker="o", color="blue")
-        (self.points_pendulums2,) = self.ax.plot([], [], ls="none", marker="o", color="red")
-        self.line_rods1 = [self.ax.plot([], [], color="black")[0] for i in range(self.nb_pend)]
-        self.line_rods2 = [self.ax.plot([], [], color="black")[0] for i in range(self.nb_pend)]
+        (self.points_pendulums1,) = self.ax.plot(
+            [], [], ls="none", marker="o", color="blue"
+        )
+        (self.points_pendulums2,) = self.ax.plot(
+            [], [], ls="none", marker="o", color="red"
+        )
+        self.line_rods1 = [
+            self.ax.plot([], [], color="black")[0] for i in range(self.nb_pend)
+        ]
+        self.line_rods2 = [
+            self.ax.plot([], [], color="black")[0] for i in range(self.nb_pend)
+        ]
         self.line_pendulums = [
             plt.plot([], [], color="red", alpha=0.2)[0] for i in range(self.nb_pend)
         ]
@@ -418,6 +459,20 @@ class DisplayDoublePendulum:
             func=self.get_frame,
             frames=len(self.timelapse) - self.display_mem,
             blit=True,
-            interval=20,
+            interval=10,
         )
         plt.show()
+
+    def show_pendulums(self):
+        """
+        Show the double pendulum in movement.
+        It initiates a move, and create the according animation.
+        """
+        self.move()
+        self.create_animation()
+
+
+if __name__ == "__main__":
+    pend = DoublePendulum([np.pi, 1, 0, 0])
+    pend_display = DisplayDoublePendulum([pend])
+    pend_display.show_pendulums()
